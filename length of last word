@@ -1,0 +1,12 @@
+class Solution:
+    def lengthOfLastWord(self, s: str) -> int:
+        return len(s.strip().split()[-1])
+
+# Object creation
+obj = Solution()
+
+# Method call
+result = obj.lengthOfLastWord("Hello World")
+
+print(result)
+        
