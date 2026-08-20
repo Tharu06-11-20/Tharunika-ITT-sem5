@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int* getSubarrayBeauty(int* nums, int numsSize, int k, int x, int* returnSize) {
+    *returnSize = numsSize - k + 1;
+    int* result = (int*)malloc((*returnSize) * sizeof(int));
+    
+    int freq[51] = {0};
+    
+    for (int i = 0; i < k; i++) {
+        if (nums[i] < 0) {
+            freq[-nums[i]]++;
+        }
+    }
+    
+    int count = 0;
+    int beauty = 0;
+    for (int val = 50; val >= 1; val--) {
+        count += freq[val];
+        if (count >= x) {
+            beauty = -val;
+            break;
+        }
+    }
+    result[0] = beauty;
+    
+    for (int i = k; i < numsSize; i++) {
+        int out_elem = nums[i - k];
+        if (out_elem < 0) {
+            freq[-out_elem]--;
+        }
+        
+        int in_elem = nums[i];
+        if (in_elem < 0) {
+            freq[-in_elem]++;
+        }
+        
+        count = 0;
+        beauty = 0;
+        for (int val = 50; val >= 1; val--) {
+            count += freq[val];
+            if (count >= x) {
+                beauty = -val;
+                break;
+            }
+        }
+        result[i - k + 1] = beauty;
+    }
+    
+    return result;
+}
