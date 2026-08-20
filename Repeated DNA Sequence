@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+char** findRepeatedDnaSequences(char* s, int* returnSize) {
+    int len = strlen(s);
+    *returnSize = 0;
+    
+    
+    if (len <= 10) {
+        return NULL;
+    }
+
+    
+    unsigned char* hash_map = (unsigned char*)calloc(1048576, sizeof(unsigned char));
+    
+  
+    char** result = (char**)malloc((len - 9) * sizeof(char*));
+
+    int char_to_val[26];
+    char_to_val['A' - 'A'] = 0; // 00
+    char_to_val['C' - 'A'] = 1; // 01
+    char_to_val['G' - 'A'] = 2; // 10
+    char_to_val['T' - 'A'] = 3; // 11
+
+    int bit_mask = 0xFFFFF; // 20 bits set to 1 (tracks last 10 characters)
+    int current_mask = 0;
+
+
+    for (int i = 0; i < 9; i++) {
+        current_mask = ((current_mask << 2) | char_to_val[s[i] - 'A']) & bit_mask;
+    }
+
+
+    for (int i = 9; i < len; i++) {
+     
+        current_mask = ((current_mask << 2) | char_to_val[s[i] - 'A']) & bit_mask;
+
+        if (hash_map[current_mask] == 1) {
+            
+            result[*returnSize] = (char*)malloc(11 * sizeof(char));
+            strncpy(result[*returnSize], &s[i - 9], 10);
+            result[*returnSize][10] = '\0';
+            (*returnSize)++;
+            
+
+            hash_map[current_mask] = 2;
+        } else if (hash_map[current_mask] == 0) {
+
+            hash_map[current_mask] = 1;
+        }
+    }
+
+    free(hash_map);
+    return result;
+}
