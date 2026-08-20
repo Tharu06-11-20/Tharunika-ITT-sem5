@@ -1,0 +1,67 @@
+#include <stdlib.h>
+
+#define HASH_SIZE 2097152
+
+typedef struct Node {
+    int key;
+    struct Node *next;
+} Node;
+
+int hash(int x) {
+    return (x & 0x7fffffff) % HASH_SIZE;
+}
+
+int insert(Node **table, int key) {
+    int h = hash(key);
+    Node *temp = table[h];
+
+    while (temp) {
+        if (temp->key == key)
+            return 0;
+        temp = temp->next;
+    }
+
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    newNode->key = key;
+    newNode->next = table[h];
+    table[h] = newNode;
+    return 1;
+}
+
+int subarrayBitwiseORs(int* arr, int arrSize) {
+    Node **table = (Node **)calloc(HASH_SIZE, sizeof(Node*));
+
+    int prev[32], prevSize = 0;
+    int curr[32], currSize;
+    int ans = 0;
+
+    for (int i = 0; i < arrSize; i++) {
+        currSize = 0;
+        curr[currSize++] = arr[i];
+
+        for (int j = 0; j < prevSize; j++) {
+            int val = prev[j] | arr[i];
+            if (val != curr[currSize - 1])
+                curr[currSize++] = val;
+        }
+
+        for (int j = 0; j < currSize; j++)
+            ans += insert(table, curr[j]);
+
+        for (int j = 0; j < currSize; j++)
+            prev[j] = curr[j];
+        prevSize = currSize;
+    }
+
+    for (int i = 0; i < HASH_SIZE; i++) {
+        Node *temp = table[i];
+        while (temp) {
+            Node *next = temp->next;
+            free(temp);
+            temp = next;
+        }
+    }
+    free(table);
+
+    return ans;
+}
