@@ -1,0 +1,43 @@
+class Solution:
+    def fullJustify(self, words, maxWidth):
+        res = []
+        i = 0
+
+        while i < len(words):
+            line_words = []
+            line_len = 0
+
+            # 1. Collect words for the current line
+            while i < len(words):
+                if line_len + len(line_words) + len(words[i]) > maxWidth:
+                    break
+                line_words.append(words[i])
+                line_len += len(words[i])
+                i += 1
+
+            spaces_needed = maxWidth - line_len
+
+            # 2. If last line or single word → left justify
+            if i == len(words) or len(line_words) == 1:
+                line = " ".join(line_words)
+                line += " " * (maxWidth - len(line))
+                res.append(line)
+
+            else:
+                gaps = len(line_words) - 1
+                space_per_gap = spaces_needed // gaps
+                extra_spaces = spaces_needed % gaps
+
+                line = ""
+
+                for j in range(gaps):
+                    line += line_words[j]
+
+                    # left slots get extra space
+                    line += " " * (space_per_gap + (1 if j < extra_spaces else 0))
+
+                line += line_words[-1]
+                res.append(line)
+
+        return res
+        
