@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+
+char* minWindow(char* s, char* t) {
+    int s_len = strlen(s);
+    int t_len = strlen(t);
+    
+    if (s_len == 0 || t_len == 0 || s_len < t_len) {
+        return "";
+    }
+
+   
+    int t_map[128] = {0};
+    int window_map[128] = {0};
+
+   
+    for (int i = 0; i < t_len; i++) {
+        t_map[(unsigned char)t[i]]++;
+    }
+
+  
+    int required = 0;
+    for (int i = 0; i < 128; i++) {
+        if (t_map[i] > 0) {
+            required++;
+        }
+    }
+
+  
+    int left = 0, right = 0;
+    
+   
+    int formed = 0;
+
+    
+    int min_len = INT_MAX;
+    int start_idx = 0;
+
+    while (right < s_len) {
+        char c = s[right];
+        window_map[(unsigned char)c]++;
+
+     
+        if (t_map[(unsigned char)c] > 0 && window_map[(unsigned char)c] == t_map[(unsigned char)c]) {
+            formed++;
+        }
+
+        
+        while (left <= right && formed == required) {
+            c = s[left];
+
+            if (right - left + 1 < min_len) {
+                min_len = right - left + 1;
+                start_idx = left;
+            }
+
+            window_map[(unsigned char)c]--;
+            if (t_map[(unsigned char)c] > 0 && window_map[(unsigned char)c] < t_map[(unsigned char)c]) {
+                formed--;
+            }
+
+     
+            left++;
+        }
+
+       
+        right++;
+    }
+
+  
+    if (min_len == INT_MAX) {
+        return "";
+    }
+
+    s[start_idx + min_len] = '\0';
+    return &s[start_idx];
+}
